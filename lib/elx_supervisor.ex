@@ -95,6 +95,11 @@ defmodule ElxSupervisor do
     {:noreply, new_state}
   end
 
+  def handle_info({:EXIT, from, :killed}, state) do
+    new_state = state |> Map.delete(from)
+    {:noreply, new_state}
+  end
+
   def handle_info({:EXIT, old_pid, _reason}, state) do
     case Map.fetch(state, old_pid) do
       {:ok, child_spec} ->
@@ -113,14 +118,9 @@ defmodule ElxSupervisor do
     end
   end
 
-  def handle_info({:EXIT, from, :killed}, state) do
-    new_state = state |> Map.delete(from)
-    {:noreply, new_state}
-  end
-
   ##Private
   defp start_child({mod, fun, args}) do
-    case apply(mod, fun args) do
+    case apply(mod, fun, args) do
       pid when is_pid(pid) ->
         Process.link(pid)
         {:ok, pid}
