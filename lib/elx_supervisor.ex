@@ -148,7 +148,7 @@ defmodule ElxSupervisor do
 
   defp restart_child(pid, child_spec) when is_pid(pid) do
     case terminate_child(pid) do
-      {:ok} ->
+      :ok ->
         case start_child(child_spec) do
           {:ok, new_pid} ->
             {:ok, {new_pid, child_spec}}
