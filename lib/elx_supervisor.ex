@@ -37,6 +37,11 @@ defmodule ElxSupervisor do
     {:ok, state}
   end
 
+  def terminate(_reason, state) do
+    terminate_children(state)
+    :ok
+  end
+
   def handle_call({:start_child, child_spec}, _from, state) do
     case start_child(child_spec) do
       {:ok, pid} ->
@@ -130,6 +135,14 @@ defmodule ElxSupervisor do
       :error ->
         :error
     end
+  end
+
+  defp terminate_children([]) do
+    :ok
+  end
+
+  defp terminate_children(child_specs) do
+    child_specs |> Enum.each(fn {pid, _} -> terminate_child(pid) end)
   end
 
 end
